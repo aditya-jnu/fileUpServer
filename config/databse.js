@@ -2,7 +2,12 @@ const mongoose=require('mongoose')
 require('dotenv').config();
 
 const dbConnect=()=>{
-    mongoose.connect(process.env.MONGODB_URL,{
+    const uri = process.env.DATABASE_URL; // Check if DATABASE_URL is properly set
+        if (!uri) {
+            throw new Error('DATABASE_URL is not defined in environment variables');
+        }
+
+    mongoose.connect(uri,{
         useNewUrlParser:true,
         useUnifiedTopology:true
     }).then(()=>{
