@@ -45,7 +45,8 @@ exports.upPost = async (req, res) => {
         }
 
         // CREATE POST ENTRY IN DB
-        const creationTime = new Date().toLocaleString();
+        const creationTime = new Date().getTime();
+        console.log("IN BACKEND CREATION",creationTime)
         const postData = await postModel.create({
             userId,
             fileUrl,

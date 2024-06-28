@@ -5,7 +5,7 @@ const postModel=require('../models/postSchema')
 exports.upComment=async(req,res)=>{
     try{
         const{comment,postId,userId}=req.body;
-        const creationTime=new Date().toLocaleString();
+        const creationTime=new Date().getTime();
         const commentData=await commentModel.create({
             postId,
             userId,
