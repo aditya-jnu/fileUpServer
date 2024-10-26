@@ -1,25 +1,13 @@
 const express=require('express');
 const app=express();
 
-const allowedOrigins = [
-    'https://campuschitchat.netlify.app',
-    'http://localhost:3000',
-    'http://localhost:3001', 
-  ];
+// const allowedOrigins = [
+//     'https://campuschitchat.netlify.app',
+//     'http://localhost:3000',
+//     'http://localhost:3001', 
+//   ];
 const cors=require('cors');
-const corsOptions = {
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        // Allow requests with no origin (like mobile apps or curl requests)
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
-      }
-    },
-    credentials: true, // Optional: If you’re handling credentials (cookies, etc.)
-  };
-  
-  app.use(cors(corsOptions));
+app.use(cors({ origin: '*', credentials: true }));
 require('dotenv').config();
 const PORT=process.env.PORT||3000;
 
