@@ -1,11 +1,13 @@
 const bcrypt = require('bcrypt');
-const jwt=require("jsonwebtoken");
 const userModel = require('../models/userSchema');
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
-// Sign-Up Controller
+//********** Sign-Up Controller **********\\
 exports.signUp = async (req, res) => {
   try {
-    const { userName, password } = req.body;
+    let { userName, password } = req.body;
+    userName = userName.toLowerCase();
     const userExist = await userModel.findOne({ userName });
 
     if (userExist) {
@@ -14,7 +16,13 @@ exports.signUp = async (req, res) => {
         message: 'this userName already exist'
       });
     }
-
+    if (password.length<8){
+      return res.status(401).json({
+        success: false,
+        message: 'the passWord must be at least 8 characters long'
+      })
+    }
+    // password hashing
     let hashedPass;
     try {
       hashedPass = await bcrypt.hash(password, 10);
@@ -48,7 +56,7 @@ exports.signUp = async (req, res) => {
   }
 };
 
-// Sign-In Controller
+//********** Sign-In Controller **********\\
 exports.signIn = async (req, res) => {
   try {
     const { userName, password } = req.body;
@@ -61,20 +69,27 @@ exports.signIn = async (req, res) => {
 
     if (!userExist) {
       console.log('user does not exist, please signUp.');
-      return res.status(400).json({
+      return res.status(402).json({
         success: false,
         message: 'user does not exist, please signUp.'
       });
     }
-     console.log('user found in DB', userExist);
+    console.log('user found in DB', userExist);
 
     const isPasswordValid = await bcrypt.compare(password, userExist.password);
 
-    if (isPasswordValid) {
-        return res.status(200).json({
+    if(isPasswordValid){
+      // Generate JWT token
+      const token = jwt.sign(
+        { userId: userExist._id, userName: userExist.userName }, // Payload with necessary user data
+        process.env.JWT_SECRET, // Secret key from environment variables
+        { expiresIn: '1h' } // Token expiry time (optional)
+      );
+      return res.status(200).json({
         success: true,
         message: 'user loggedIn successfully.',
-        user: userExist
+        user: userExist,
+        token: token
       });
     } else {
       return res.status(403).json({
